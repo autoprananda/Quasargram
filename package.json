@@ -10,8 +10,12 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "-": "0.0.1",
     "@quasar/extras": "^1.0.0",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "firebase-tools": "^9.7.0",
+    "g": "^2.0.1",
     "md-gum-polyfill": "^1.0.0",
     "quasar": "^1.0.0"
   },
