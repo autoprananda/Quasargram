@@ -28,7 +28,7 @@
           </q-card>
         </template>
         <template v-else-if="!loadingPost && !posts.length">
-          <h5 class="text-center text-grey">No Posts yet.</h5>
+          <h5 class="text-center text-grey">No posts yet.</h5>
         </template>
         <template v-else>
           <q-card flat bordered>
@@ -99,7 +99,7 @@ export default {
   methods: {
     getPost(){
       this.loadingPost = true
-      axios.get('http://localhost:3000/posts').then(response => {
+      axios.get(`${ process.env.API}/posts`).then(response => {
         console.log('response', response)
         this.posts = response.data
         this.loadingPost = false

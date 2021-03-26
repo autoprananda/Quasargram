@@ -2,7 +2,8 @@
  * This file runs in a Node context (it's NOT transpiled by Babel), so use only
  * the ES6 features that are supported by your Node version. https://node.green/
  */
-
+let API_LOCAL = 'http://localhost:3000'
+    API_PRODUCTION = 'https://quasargram-backend9.herokuapp.com'
 // Configuration for your app
 // https://quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-env node */
@@ -43,6 +44,10 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
+      env: {
+        API : API_LOCAL //API_LOCAL | API_PRODUCTION
+      },
+
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
       // transpile: false,
