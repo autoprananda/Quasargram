@@ -15,7 +15,7 @@
       />
     </div>
     <div class="text-center q-pa-md">
-      <q-btn v-if="hasCameraSupport" @click="captureImage" round color="grey-10" size="lg" icon="eva-camera" />
+      <q-btn v-if="hasCameraSupport" :disable="imageCapture" @click="captureImage" round color="grey-10" size="lg" icon="eva-camera" />
       <q-file outlined 
       v-else 
      
@@ -29,7 +29,7 @@
       </q-file>
     </div>
     <div class="row justify-center q-ma-md">
-      <q-input v-model="post.caption" label="Caption" class="col col-sm-6" dense />
+      <q-input v-model="post.caption" label="Caption *" class="col col-sm-6" dense />
     </div>
     <div class="row justify-center q-ma-md">
       <q-input :loading="locationLoading" v-model="post.location" label="Location" class="col col-sm-6" dense 
@@ -40,7 +40,7 @@
       </q-input>
     </div>
     <div class="row justify-center q-mt-lg">
-    <q-btn @click="addPost" unelevated rounded color="primary" label="Post Image" />
+    <q-btn :disable="!post.caption || !post.photo" @click="addPost" unelevated rounded color="primary" label="Post Image" />
     </div>
   </q-page>
 </template>
@@ -191,6 +191,7 @@ export default {
       this.locationLoading = false
     },
     addPost(){
+      this.$q.loading.show()
       let formData = new FormData()
       formData.append('id', this.post.id)
       formData.append('caption', this.post.caption)
@@ -200,8 +201,22 @@ export default {
       axios.post(`${ process.env.API}/createpost`, formData).then(
         response => {
           console.log('response', response)
+          this.$router.push('/')
+          this.$q.notify({
+            message: 'Post Created!',
+            actions: [{
+              label: 'Dismiss',
+              color: 'white'
+            }]
+          })
+          this.$q.loading.hide()
         }).catch(err => {
-          console.log('err', rrr)
+          console.log('err', err)
+          this.$q.dialog({
+            title: 'Error',
+            message: 'Sorry, Could not create post!'
+          })
+          this.$q.loading.hide()
         })
     }
   }
