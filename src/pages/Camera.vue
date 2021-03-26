@@ -32,10 +32,10 @@
       <q-input v-model="post.caption" label="Caption" class="col col-sm-6" dense />
     </div>
     <div class="row justify-center q-ma-md">
-      <q-input v-model="post.location" label="Location" class="col col-sm-6" dense 
+      <q-input :loading="locationLoading" v-model="post.location" label="Location" class="col col-sm-6" dense 
       >
       <template v-slot:append>
-          <q-btn round dense flat icon="eva-navigation-2-outline" />
+          <q-btn v-if="!locationLoading" @click="getLocation" round dense flat icon="eva-navigation-2-outline" />
         </template>
       </q-input>
     </div>
@@ -47,6 +47,7 @@
 
 <script>
 import { uid } from 'quasar'
+import axios from 'axios'
 require('md-gum-polyfill')
 
 export default {
@@ -62,17 +63,26 @@ export default {
         },
       imageCapture: false,
       imageUpload: [],
-      hasCameraSupport: true
+      hasCameraSupport: true,
+      locationLoading: false
     }
   },
   mounted() {
   this.initCamera()
+  console.log(navigator, 'A')
   },
   beforeDestroy() {
     if (this.hasCameraSupport) {
       this.disableCamera()
     }
   },
+  // computed: {
+  //   locationSupported(){
+  //     if ('geolocation' in navigator) return
+  //     true
+  //     return false
+  //   }
+  // },
   methods: {
     initCamera() {
       navigator.mediaDevices.getUserMedia({
@@ -144,8 +154,42 @@ export default {
         });
         return blob;
 
-}
+    },
+    getLocation() {
+      this.locationLoading = true
+        navigator.geolocation.getCurrentPosition(position => {
+          this.getCityandCountry(position)
+          console.log('position', position)
+        }), err => {
+          this.locationError()
+        }, {
+          timeout: 7000
+        }
 
+      },
+      getCityandCountry(position) {
+        let apiUrl = `http://geocode.xyz/${ position.coords.latitude },${ position.coords.longitude }?json=1`
+        axios.get(apiUrl).then(result => {
+          console.log(result, 'LOC')
+          this.getLocationSucces(result)
+        }), err => {
+          this.locationError()
+        }
+      },
+    getLocationSucces(result) {
+      this.post.location = result.data.city
+      if (result.data.country) {
+        this.post.location += `, ${ result.data.country}`
+      }
+      this.locationLoading = false
+    },
+    locationError(){
+      this.$q.dialog({
+        title: 'Error',
+        message: 'Could not find your location'
+      })
+      this.locationLoading = false
+    }
   }
 }
 </script>
