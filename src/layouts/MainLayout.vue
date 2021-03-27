@@ -22,13 +22,23 @@
       </q-toolbar>
     </q-header>
 
-    <q-footer class="bg-white small-screen-only" bordered>
-        <q-tabs 
-        class="text-grey-10"
-        active-color="primary"
-        indicator-color="transparent">
+    <q-footer class="bg-white" bordered>
+        <div class="banner-container bg-primary">
+          <div class="constrain">
+            <q-banner dense inline-actions class="bg-primary text-white">
+              <b>Install Quasargram?</b>
+
+              <template v-slot:action>
+                <q-btn flat label="Yes" dense class="q-px-sm" />
+                <q-btn flat label="Later" dense class="q-px-sm" />
+                <q-btn flat label="Never" dense class="q-px-sm" />
+              </template>
+            </q-banner>
+          </div>
+        </div>
+        <q-tabs class="text-grey-10 small-screen-only" active-color="primary" indicator-color="transparent">
           <q-route-tab to="/" icon="eva-home-outline" />
-          <q-route-tab to="/camera" icon="eva-camera-outline"/>
+          <q-route-tab to="/camera" icon="eva-camera-outline" />
         </q-tabs>
     </q-footer> 
 
