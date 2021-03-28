@@ -23,19 +23,21 @@
     </q-header>
 
     <q-footer class="bg-white" bordered>
-        <div class="banner-container bg-primary">
+        <transition appear enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
+        <div v-if="showInstallBanner" class="banner-container bg-primary">
           <div class="constrain">
             <q-banner dense inline-actions class="bg-primary text-white">
               <b>Install Quasargram?</b>
 
               <template v-slot:action>
-                <q-btn flat label="Yes" dense class="q-px-sm" />
-                <q-btn flat label="Later" dense class="q-px-sm" />
-                <q-btn flat label="Never" dense class="q-px-sm" />
+                <q-btn flat label="Yes" dense class="q-px-sm" @click="installApp"/>
+                <q-btn flat label="Later" dense class="q-px-sm" @click="later" />
+                <q-btn flat label="Never" dense class="q-px-sm" @click="neverShowInstallAppBanner" />
               </template>
             </q-banner>
           </div>
         </div>
+        </transition>
         <q-tabs class="text-grey-10 small-screen-only" active-color="primary" indicator-color="transparent">
           <q-route-tab to="/" icon="eva-home-outline" />
           <q-route-tab to="/camera" icon="eva-camera-outline" />
@@ -49,11 +51,51 @@
 </template>
 
 <script>
-
+let deferredPrompt;
 export default {
   name: 'MainLayout',
   data () {
     return {
+      showInstallBanner: false
+    }
+  },
+  mounted() {
+    let neverShowInstallAppBanner = this.$q.localStorage.getItem('neverShowInstallAppBanner')
+    if (!neverShowInstallAppBanner) {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI notify the user they can install the PWA
+        setTimeout(() => {
+
+          this.showInstallBanner = true
+        }, 2000)
+      })
+    }
+  },
+  methods: {
+    installApp() {
+      // Hide the app provided install promotion
+      this.showInstallBanner = false
+      // Show the install prompt
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt')
+          this.neverShowInstallAppBanner()
+        } else {
+          console.log('User dismissed the install prompt')
+        }
+      })
+    },
+    later() {
+      this.showInstallBanner = false
+    },
+    neverShowInstallAppBanner() {
+      this.showInstallBanner = false
+      this.$q.localStorage.set('neverShowInstallAppBanner', true)
     }
   }
 }
